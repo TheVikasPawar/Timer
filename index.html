@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Goal Countdown Timer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            color: white;
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .countdown {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .time-unit {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 1.5rem 1rem;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            min-width: 120px;
+            text-align: center;
+        }
+
+        .time-unit:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .time-value {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            font-family: 'Courier New', monospace;
+        }
+
+        .time-label {
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.8;
+        }
+
+        .target-date {
+            text-align: center;
+            margin: 2rem 0;
+            font-size: 1.1rem;
+            opacity: 0.8;
+        }
+
+        .goals-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .goals-title {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .goals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .category {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .category-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            color: #FFD700;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .goal-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.8rem;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+        }
+
+        .goal-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .goal-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin-right: 0.8rem;
+            cursor: pointer;
+            accent-color: #4CAF50;
+        }
+
+        .goal-item label {
+            cursor: pointer;
+            font-size: 1rem;
+            line-height: 1.4;
+        }
+
+        .goal-item.completed label {
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+
+        .progress-bar {
+            background: rgba(255, 255, 255, 0.2);
+            height: 8px;
+            border-radius: 4px;
+            margin-top: 1rem;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #4CAF50, #45a049);
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+            width: 0%;
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .completed-message {
+            font-size: 2rem;
+            color: #4CAF50;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @media (max-width: 768px) {
+            .countdown {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+            
+            .time-value {
+                font-size: 2rem;
+            }
+            
+            .title {
+                font-size: 2rem;
+            }
+            
+            .goals-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .countdown {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .time-unit {
+                width: 100%;
+                max-width: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <h1 class="title">🎯 Goal Countdown</h1>
+        <p class="subtitle">Time remaining to achieve your goals</p>
+        
+        <div class="countdown" id="countdown">
+            <div class="time-unit">
+                <div class="time-value" id="days">00</div>
+                <div class="time-label">Days</div>
+            </div>
+            <div class="time-unit">
+                <div class="time-value" id="hours">00</div>
+                <div class="time-label">Hours</div>
+            </div>
+            <div class="time-unit">
+                <div class="time-value" id="minutes">00</div>
+                <div class="time-label">Minutes</div>
+            </div>
+            <div class="time-unit">
+                <div class="time-value" id="seconds">00</div>
+                <div class="time-label">Seconds</div>
+            </div>
+        </div>
+        
+        <div class="target-date">
+            Target: August 31, 2025 at 23:59
+        </div>
+
+
+    <script>
+        // Set the target date - August 31, 2025 at 23:59
+        const targetDate = new Date('August 31, 2025 23:59:00').getTime();
+
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const distance = targetDate - now;
+
+            // If countdown is finished
+            if (distance < 0) {
+                document.getElementById('countdown').innerHTML = 
+                    '<div class="completed-message pulse">🎉 Goal Deadline Reached! 🎉</div>';
+                return;
+            }
+
+            // Calculate time units
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            // Update the display
+            document.getElementById('days').textContent = days.toString().padStart(2, '0');
+            document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+            document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+            document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+
+            // Add pulse animation when less than 24 hours remain
+            if (days === 0) {
+                document.querySelectorAll('.time-unit').forEach(unit => {
+                    unit.classList.add('pulse');
+                });
+            }
+        }
+
+        function updateProgress() {
+            const categories = {
+                'programming': ['csharp'],
+                'web': ['aspnet', 'html', 'js'],
+                'react': ['reactjs', 'reactnative'],
+                'database': ['sql'],
+                'professional': ['communication', 'interview'],
+                'projects': ['project1', 'project2', 'profile', 'resume'],
+                'applications': ['apply']
+            };
+
+            Object.keys(categories).forEach(category => {
+                const checkboxes = categories[category];
+                const completed = checkboxes.filter(id => document.getElementById(id).checked).length;
+                const total = checkboxes.length;
+                const percentage = Math.round((completed / total) * 100);
+
+                const progressBar = document.getElementById(`${category}-progress`);
+                const progressText = document.getElementById(`${category}-text`);
+
+                progressBar.style.width = `${percentage}%`;
+                progressText.textContent = `${percentage}% Complete (${completed}/${total})`;
+            });
+
+            // Update completed item styling
+            document.querySelectorAll('.goal-item').forEach(item => {
+                const checkbox = item.querySelector('input[type="checkbox"]');
+                if (checkbox.checked) {
+                    item.classList.add('completed');
+                } else {
+                    item.classList.remove('completed');
+                }
+            });
+
+            // Save progress to localStorage (if available)
+            saveProgress();
+        }
+
+        function saveProgress() {
+            try {
+                const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+                const progress = {};
+                checkboxes.forEach(checkbox => {
+                    progress[checkbox.id] = checkbox.checked;
+                });
+                localStorage.setItem('goalProgress', JSON.stringify(progress));
+            } catch (e) {
+                // localStorage not available, continue without saving
+            }
+        }
+
+        function loadProgress() {
+            try {
+                const saved = localStorage.getItem('goalProgress');
+                if (saved) {
+                    const progress = JSON.parse(saved);
+                    Object.keys(progress).forEach(id => {
+                        const checkbox = document.getElementById(id);
+                        if (checkbox) {
+                            checkbox.checked = progress[id];
+                        }
+                    });
+                    updateProgress();
+                }
+            } catch (e) {
+                // localStorage not available, continue without loading
+            }
+        }
+
+        // Initialize
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+        loadProgress();
+
+        // Add click event for exact time remaining
+        document.querySelector('.target-date').addEventListener('click', function() {
+            const now = new Date().getTime();
+            const distance = targetDate - now;
+            
+            if (distance > 0) {
+                const totalHours = Math.floor(distance / (1000 * 60 * 60));
+                const totalMinutes = Math.floor(distance / (1000 * 60));
+                
+                alert(`Exact time remaining:\n${totalHours} total hours\n${totalMinutes} total minutes`);
+            }
+        });
+    </script>
+</body>
+</html>
